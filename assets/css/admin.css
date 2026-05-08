@@ -1,0 +1,63 @@
+.redis-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.redis-stat {
+    background: #1e3a8a;
+    color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.redis-stat .num {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.redis-stat .lbl {
+    font-size: 0.75rem;
+    opacity: .8;
+    text-transform: uppercase;
+}
+
+.log-item {
+    padding: 6px 12px;
+    border-left: 3px solid #3b82f6;
+    background: #f0f9ff;
+    margin-bottom: 6px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.85rem;
+}
+
+.badge-en-proceso {
+    background: #fef9c3;
+    color: #713f12;
+}
+
+.pill-hit {
+    background: #dcfce7;
+    color: #166534;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.pill-miss {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.redis-section h3 {
+    color: #1e40af;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: .5rem;
+}
