@@ -7,12 +7,16 @@ RUN apt-get update && apt-get install -y libzip-dev unzip libsqlite3-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && a2enmod rewrite
 
-# Fix MPM — eliminar directamente los symlinks conflictivos
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.conf \
-          /etc/apache2/mods-enabled/mpm_event.load \
-          /etc/apache2/mods-enabled/mpm_worker.conf \
-          /etc/apache2/mods-enabled/mpm_worker.load \
-    && a2enmod mpm_prefork
+# Fix MPM nuclear: borrar TODO lo de mpm y recrear solo prefork
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf \
+          /etc/apache2/mods-enabled/mpm_*.load && \
+    ln -sf /etc/apache2/mods-available/mpm_prefork.load \
+           /etc/apache2/mods-enabled/mpm_prefork.load && \
+    ln -sf /etc/apache2/mods-available/mpm_prefork.conf \
+           /etc/apache2/mods-enabled/mpm_prefork.conf
+
+# Verificar que quedó correcto
+RUN echo "MPM activo:" && ls /etc/apache2/mods-enabled/ | grep mpm
 
 RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
