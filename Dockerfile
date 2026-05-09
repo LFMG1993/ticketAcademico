@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y libzip-dev unzip libsqlite3-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && a2enmod rewrite
 
-# Fix MPM nuclear: borrar TODO lo de mpm y recrear solo prefork
+# Fix MPM nuclear
 RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf \
           /etc/apache2/mods-enabled/mpm_*.load && \
     ln -sf /etc/apache2/mods-available/mpm_prefork.load \
@@ -25,6 +25,8 @@ COPY . /var/www/html/
 RUN mkdir -p /var/www/html/data \
     && chown -R www-data:www-data /var/www/html/data \
     && chmod 775 /var/www/html/data
+
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
