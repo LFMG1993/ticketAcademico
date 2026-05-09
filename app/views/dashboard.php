@@ -93,14 +93,21 @@ $redisActivo = $redis !== null;
     }
 
     // tickets
-let estaEnviando = false;
-async function cargarTickets() {
-    try {
-        const r = await fetch('../Controllers/Api/tickets.php');
-        if (r.status === 401) { window.location = 'login.php'; return; }
-        if (!r.ok) return;
-        const tickets = await r.json();
-        if (tickets.error) { console.error('Tickets API:', tickets.error); return; }
+    let estaEnviando = false;
+
+    async function cargarTickets() {
+        try {
+            const r = await fetch('../Controllers/Api/tickets.php');
+            if (r.status === 401) {
+                window.location = 'login.php';
+                return;
+            }
+            if (!r.ok) return;
+            const tickets = await r.json();
+            if (tickets.error) {
+                console.error('Tickets API:', tickets.error);
+                return;
+            }
 
             if (estaEnviando) return;
 
@@ -207,26 +214,40 @@ async function cargarTickets() {
     }
 
     // redis panel
-async function cargarRedis() {
-    try {
-        const r = await fetch('../Controllers/Api/redis.php');
-        if (r.status === 401) { window.location = 'login.php'; return; }
-        if (!r.ok) return;
-        const d = await r.json();
-        if (d.error) { console.error('Redis API:', d.error); return; }
+    async function cargarRedis() {
+        try {
+            const r = await fetch('../Controllers/Api/redis.php');
+            if (r.status === 401) {
+                window.location = 'login.php';
+                return;
+            }
+            if (!r.ok) return;
+            const d = await r.json();
 
-            const pulse = document.getElementById('redis-pulse');
-            pulse.textContent = '⟳ ' + new Date().toLocaleTimeString();
+            if (!d || !d.activo) {
+                document.getElementById('redis-stats').innerHTML =
+                    '<p style="color:#94a3b8;padding:1rem">Redis no disponible — funcionando solo con SQLite.</p>';
+                document.getElementById('redis-log').innerHTML =
+                    '<p style="color:#94a3b8">Sin actividad.</p>';
+                document.getElementById('redis-keys').innerHTML = '';
+                document.getElementById('redis-pulse').textContent = '⟳ sin Redis';
+                return;
+            }
 
-            // Stats
+            // cache Ok definido antes de usarlo
             const cacheOk = d.cacheTTL > 0;
+
+            document.getElementById('redis-pulse').textContent = '⟳ ' + new Date().toLocaleTimeString();
+
             document.getElementById('redis-stats').innerHTML = `
             <div class="redis-stat">
                 <div class="num">${d.contador}</div>
                 <div class="lbl">Contador tickets</div>
             </div>
             <div class="redis-stat" style="background:${cacheOk ? '#065f46' : '#7f1d1d'}">
-                <div class="num" style="font-size:1.2rem">${cacheOk ? '✓ ACTIVA (' + d.cacheTTL + 's)' : '✗ EXPIRADA'}</div>
+                <div class="num" style="font-size:1.2rem">
+                    ${cacheOk ? '✓ ACTIVA (' + d.cacheTTL + 's)' : '✗ EXPIRADA'}
+                </div>
                 <div class="lbl">Caché tickets:recientes</div>
             </div>
             <div class="redis-stat" style="background:#1e3a5f">
@@ -234,12 +255,10 @@ async function cargarRedis() {
                 <div class="lbl">Sesiones admin activas</div>
             </div>`;
 
-            // Log
             document.getElementById('redis-log').innerHTML = d.log.length
                 ? d.log.map(e => `<div class="log-item">${esc(e)}</div>`).join('')
                 : '<p style="color:#94a3b8">Sin actividad aún.</p>';
 
-            // Keys table
             let kRows = d.claves.map(c => `
             <tr>
                 <td><code>${esc(c.key)}</code></td>
@@ -252,6 +271,7 @@ async function cargarRedis() {
                 <thead><tr><th>Clave</th><th>Tipo</th><th>TTL</th><th>Valor</th></tr></thead>
                 <tbody>${kRows}</tbody>
              </table>`;
+
         } catch (e) {
             console.warn('redis fetch error', e);
         }

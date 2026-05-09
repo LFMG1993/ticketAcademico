@@ -15,7 +15,7 @@ if ($redis && $redis->exists('tickets:recientes')) {
         $redis->setex('tickets:recientes', 30, json_encode($tickets));
     }
 }
-$totalRedis = ($redis && $redis->exists('tickets:contador')) ? (int)$redis->get('tickets:contador') : count($tickets);
+$totalRedis = $redis ? ((int)$redis->get('tickets:contador') ?: count($tickets)) : count($tickets);
 ?>
 <!DOCTYPE html>
 <html lang="es">
